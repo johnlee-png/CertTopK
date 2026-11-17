@@ -1,0 +1,27 @@
+{
+  "t_e_s_per_call": 0.054062888182869015,
+  "n_profile_loans": 110,
+  "cost_medians": {
+    "seed": 9.5,
+    "scale": 1.855447786826864e-06,
+    "own_P1": 3.985472223905806e-08,
+    "own_TOPM": 7.261732791813321e-08,
+    "own_P2": 4.372603347998393e-08,
+    "own_P3": 1.6473898553202645e-06,
+    "own_P3c": 1.583532854708894e-06
+  },
+  "same_choice_as_before": 119,
+  "n_runs": 120,
+  "seed0_k10_choices": [
+    {
+      "eps": 0.05,
+      "auto_time_fitprofiled": "P2",
+      "auto_calls": "P2"
+    },
+    {
+      "eps": 0.1,
+      "auto_time_fitprofiled": "P1",
+      "auto_calls": "P2"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "n": 1000,
+  "parallel": 8,
+  "wall_seconds": 59.008008799981326,
+  "seconds_per_loan": 0.059008008799981325,
+  "mean_prompt_tokens": 170.458,
+  "cheap_seconds_per_loan": 3.6233199993148445e-07,
+  "cost_ratio": 162856.1893819467,
+  "repaid_rate": 0.842,
+  "auc_llm_alone": 0.6807029676177877,
+  "auc_cheap_holdout": 0.6811001141987059,
+  "auc_cheap_plus_llm_holdout": 0.69878508588186,
+  "auc_cheap_same_rows": 0.6763021924312247,
+  "corr_llm_cheap": 0.5928160793198226,
+  "nan_answers": 0
+}

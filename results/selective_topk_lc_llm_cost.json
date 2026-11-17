@@ -1,0 +1,65 @@
+{
+  "cheap_seconds_per_loan": 6.451849755172257e-07,
+  "scale_seconds_per_loan": 1.6260940549073432e-06,
+  "llm_seconds_per_loan": 0.06,
+  "llm_over_cheap": 92996.58590453035,
+  "loans": 125281,
+  "rows_per_query": 500,
+  "calibration_llm_minutes": 25.0,
+  "configs": [
+    {
+      "k_fraction": 0.05,
+      "eps": 0.05,
+      "calls": 0.0387729722675367,
+      "m_cal": 50.0,
+      "seconds_per_loan": 0.0023286496150826262,
+      "speedup_vs_all_llm": 25.766283083703232,
+      "breakeven_queries": 52.0168477970809
+    },
+    {
+      "k_fraction": 0.05,
+      "eps": 0.1,
+      "calls": 0.0146939706362153,
+      "m_cal": 50.0,
+      "seconds_per_loan": 0.0008839095172033425,
+      "speedup_vs_all_llm": 67.8809810474893,
+      "breakeven_queries": 50.7456551669385
+    },
+    {
+      "k_fraction": 0.1,
+      "eps": 0.05,
+      "calls": 0.0445780130505709,
+      "m_cal": 50.0,
+      "seconds_per_loan": 0.0026769520620646783,
+      "speedup_vs_all_llm": 22.413791429159268,
+      "breakeven_queries": 52.332896545164516
+    },
+    {
+      "k_fraction": 0.1,
+      "eps": 0.1,
+      "calls": 0.0070209853181076,
+      "m_cal": 50.0,
+      "seconds_per_loan": 0.00042353039811688053,
+      "speedup_vs_all_llm": 141.66786009163218,
+      "breakeven_queries": 50.35353140470732
+    },
+    {
+      "k_fraction": 0.2,
+      "eps": 0.05,
+      "calls": 0.05015311908646,
+      "m_cal": 50.0,
+      "seconds_per_loan": 0.0030114584242180247,
+      "speedup_vs_all_llm": 19.924115406160947,
+      "breakeven_queries": 52.64006336675149
+    },
+    {
+      "k_fraction": 0.2,
+      "eps": 0.1,
+      "calls": 0.0,
+      "m_cal": 50.0,
+      "seconds_per_loan": 2.271279030424569e-06,
+      "speedup_vs_all_llm": 26417.117571749703,
+      "breakeven_queries": 50.0
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "seed": 0,
+  "n_test": 62004,
+  "index_build_seconds": 5.753858799929731,
+  "full_test_seconds": {
+    "duckdb_parquet": 0.8134049999061972,
+    "duckdb_memory": 0.7147914000088349,
+    "offset_index": 0.9734148000134155
+  },
+  "configs": [
+    {
+      "k_fraction": 0.05,
+      "eps": 0.05,
+      "call_fraction": 0.04633572027611122,
+      "sec_duckdb_parquet": 0.3445860999636352,
+      "sec_duckdb_memory": 0.15569109993521124,
+      "sec_offset_index": 0.038042600033804774,
+      "time_fraction_duckdb_parquet": 0.4236341060152978,
+      "time_fraction_duckdb_memory": 0.2178133367766972,
+      "time_fraction_offset_index": 0.03908159197217925
+    },
+    {
+      "k_fraction": 0.05,
+      "eps": 0.1,
+      "call_fraction": 0.021321205083542998,
+      "sec_duckdb_parquet": 0.32453780004289,
+      "sec_duckdb_memory": 0.13485469995066524,
+      "sec_offset_index": 0.016988999908789992,
+      "time_fraction_duckdb_parquet": 0.3989867287271606,
+      "time_fraction_duckdb_memory": 0.18866301406116304,
+      "time_fraction_offset_index": 0.017452991169392383
+    },
+    {
+      "k_fraction": 0.1,
+      "eps": 0.05,
+      "call_fraction": 0.07433391394103606,
+      "sec_duckdb_parquet": 0.3880701999878511,
+      "sec_duckdb_memory": 0.18150259996764362,
+      "sec_offset_index": 0.06576210004277527,
+      "time_fraction_duckdb_parquet": 0.4770934528710836,
+      "time_fraction_duckdb_memory": 0.2539238720071341,
+      "time_fraction_offset_index": 0.06755814688852989
+    },
+    {
+      "k_fraction": 0.1,
+      "eps": 0.1,
+      "call_fraction": 0.020159989678085286,
+      "sec_duckdb_parquet": 0.32370770000852644,
+      "sec_duckdb_memory": 0.1389981999527663,
+      "sec_offset_index": 0.016461700084619224,
+      "time_fraction_duckdb_parquet": 0.3979662038539925,
+      "time_fraction_duckdb_memory": 0.19445981016426367,
+      "time_fraction_offset_index": 0.016911290114340106
+    },
+    {
+      "k_fraction": 0.2,
+      "eps": 0.05,
+      "call_fraction": 0.10141281207664021,
+      "sec_duckdb_parquet": 0.3830775999231264,
+      "sec_duckdb_memory": 0.20120880007743835,
+      "sec_offset_index": 0.08562390005681664,
+      "time_fraction_duckdb_parquet": 0.47095555100755876,
+      "time_fraction_duckdb_memory": 0.2814930342963715,
+      "time_fraction_offset_index": 0.08796239799891739
+    },
+    {
+      "k_fraction": 0.2,
+      "eps": 0.1,
+      "call_fraction": 0.021256693116573123,
+      "sec_duckdb_parquet": 0.32084679999388754,
+      "sec_duckdb_memory": 0.1389800999313593,
+      "sec_offset_index": 0.016217099968343973,
+      "time_fraction_duckdb_parquet": 0.3944490137519292,
+      "time_fraction_duckdb_memory": 0.19443448806133018,
+      "time_fraction_offset_index": 0.01666000965684975
+    }
+  ]
+}

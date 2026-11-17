@@ -1,0 +1,105 @@
+{
+  "summary": {
+    "matches": 10,
+    "passes": 4110,
+    "cheap_ms_per_pass": 0.010605158121155126,
+    "expensive_ms_per_pass": 0.48676985412283175,
+    "share_read": 0.48402570967346564,
+    "share_features": 0.5006697160229352,
+    "share_predict": 0.015304574303599118,
+    "cost_ratio": 45.89934903015026,
+    "missing_frames": 0
+  },
+  "per_match": [
+    {
+      "match_id": 3941020,
+      "passes": 336,
+      "cheap_s": 0.004202699987217784,
+      "read_360_s": 0.10890160000417382,
+      "features_360_s": 0.09119110007304698,
+      "expensive_predict_s": 0.0029096000362187624,
+      "missing_frames": 0
+    },
+    {
+      "match_id": 3857272,
+      "passes": 348,
+      "cheap_s": 0.012469999957829714,
+      "read_360_s": 0.0822628999594599,
+      "features_360_s": 0.07041230006143451,
+      "expensive_predict_s": 0.003256900003179908,
+      "missing_frames": 0
+    },
+    {
+      "match_id": 3788771,
+      "passes": 438,
+      "cheap_s": 0.00421659997664392,
+      "read_360_s": 0.08766840002499521,
+      "features_360_s": 0.10849200002849102,
+      "expensive_predict_s": 0.003645900054834783,
+      "missing_frames": 0
+    },
+    {
+      "match_id": 3857298,
+      "passes": 519,
+      "cheap_s": 0.004072499927133322,
+      "read_360_s": 0.09986079996451735,
+      "features_360_s": 0.13654580002184957,
+      "expensive_predict_s": 0.0036185000790283084,
+      "missing_frames": 0
+    },
+    {
+      "match_id": 3998841,
+      "passes": 271,
+      "cheap_s": 0.002194999950006604,
+      "read_360_s": 0.0823765000095591,
+      "features_360_s": 0.08261379995383322,
+      "expensive_predict_s": 0.002369499998167157,
+      "missing_frames": 0
+    },
+    {
+      "match_id": 3930169,
+      "passes": 369,
+      "cheap_s": 0.0026183000300079584,
+      "read_360_s": 0.10112880007363856,
+      "features_360_s": 0.09897790011018515,
+      "expensive_predict_s": 0.003053799970075488,
+      "missing_frames": 0
+    },
+    {
+      "match_id": 3895333,
+      "passes": 373,
+      "cheap_s": 0.0038128000451251864,
+      "read_360_s": 0.10993260005488992,
+      "features_360_s": 0.10669229994527996,
+      "expensive_predict_s": 0.0029687000205740333,
+      "missing_frames": 0
+    },
+    {
+      "match_id": 3788764,
+      "passes": 469,
+      "cheap_s": 0.004737099981866777,
+      "read_360_s": 0.09850329998880625,
+      "features_360_s": 0.10725630004890263,
+      "expensive_predict_s": 0.002934899996034801,
+      "missing_frames": 0
+    },
+    {
+      "match_id": 3895266,
+      "passes": 524,
+      "cheap_s": 0.0028762000147253275,
+      "read_360_s": 0.10836319997906685,
+      "features_360_s": 0.11138259992003441,
+      "expensive_predict_s": 0.0029871000442653894,
+      "missing_frames": 0
+    },
+    {
+      "match_id": 3893794,
+      "passes": 463,
+      "cheap_s": 0.002386000007390976,
+      "read_360_s": 0.0893553999485448,
+      "features_360_s": 0.08808780007530004,
+      "expensive_predict_s": 0.0028737999964505434,
+      "missing_frames": 0
+    }
+  ]
+}
