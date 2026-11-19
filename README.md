@@ -24,7 +24,8 @@ This artifact lets a reader regenerate the tables and figures of the paper at th
    The LLM outputs are saved (`results/selective_topk_llm_scores.csv`, `results/selective_topk_llm_scores_c1.csv`), so no
    LLM call is needed.
 2. **From the public data (hours).** Download the data sets below and rerun the experiment scripts listed per table.
-3. **Checks.** `code/check_definitions.py` runs 16 boundary-case checks of the definitions against the code (all pass);
+3. **Checks.** `proofs.pdf` gives the full statements and proofs of the structural results (Secs. A.1–A.3; Results A.1, A.3,
+   A.6 are Theorems 3–5 of the paper, the others its supporting results). `code/check_definitions.py` runs 16 boundary-case checks of the definitions against the code (all pass);
    `code/export_splits.py` regenerates the splits and their SHA-256 hashes (`results/splits/summary.csv`).
 
 `claims_map.md` maps every quantitative claim of the paper to its table or figure, raw result file, and script, and
@@ -94,8 +95,9 @@ queries, and the SHA-256 of the assignment. `results/splits/<dataset>_seed0.csv.
 | Figures | `make_paper_figs.py`, `make_concept_figs.py` | `figures/*.pdf` |
 
 `src_vldb_e2e.py` holds the single per-query function `answer` used for every timed number (cheap model → priority →
-selection → data access → expensive model → mixed top-k); refining everyone runs through the same function and access
-path, and the loss of each timed answer is recorded in the same loop. Earlier timing scripts (`..._hc_time_v2.py`,
+selection → data access → expensive model → mixed top-k); refining everyone (ALL) runs through the same function and
+access path but skips cheap inference, which it does not need (it reads the inputs and runs only the expensive path),
+and the loss of each timed answer is recorded in the same loop. Earlier timing scripts (`..._hc_time_v2.py`,
 `..._hc_time_breakdown.py`, `..._llm_orders.py`, `..._llm_pipeline.py`, `..._llm_profile_fit.py`, and their result
 files, including `selective_topk_auto_time_*.csv`) are superseded by this protocol and kept for reference only.
 `results/e2e/llm_queries.csv`, `llm_summary.csv`, and `llm_moretest_queries.csv` are an earlier run against the logged

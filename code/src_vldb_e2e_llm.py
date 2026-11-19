@@ -99,6 +99,9 @@ class LendingClubLLM:
         self.fresh_log = []
 
     # ---- per-query steps
+    def inputs(self, q):
+        return self.Xc.iloc[q["rows"]]
+
     def cheap(self, q):
         X = self.Xc.iloc[q["rows"]]
         return self.cheap_m.predict_proba(X)[:, self.col_c], X

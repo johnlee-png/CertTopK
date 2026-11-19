@@ -59,10 +59,14 @@ def answer(wl, q, policy, lam, timings=None):
     stage times are added to it (they are diagnostics; the reported latency is measured around this call)."""
     tic = time.perf_counter
     t0 = tic()
-    pc, aux = wl.cheap(q)                                  # cheap inference on the query's candidates
     R, C = wl.R(q), wl.C(q)
-    uc = utility(pc, R, C)
     k = wl.k(q)
+    if policy == "ALL":                                    # refining everyone needs the inputs, not cheap inference
+        aux = wl.inputs(q)
+        uc = np.zeros(len(R))
+    else:
+        pc, aux = wl.cheap(q)                              # cheap inference on the query's candidates
+        uc = utility(pc, R, C)
     t1 = tic()
     if policy == "ALL":
         sel = np.arange(len(uc))

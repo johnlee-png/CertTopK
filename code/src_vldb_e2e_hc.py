@@ -88,6 +88,9 @@ class HomeCredit:
         return F.reindex(columns=self.agg_cols)
 
     # ---- per-query steps used by e2e.answer
+    def inputs(self, q):
+        return self.Xc.iloc[q["rows"]]
+
     def cheap(self, q):
         X = self.Xc.iloc[q["rows"]]
         return 1 - self.cheap_m.predict_proba(X)[:, 1], X
@@ -190,10 +193,7 @@ def profile(wl, qs, n_q=5):
             e2e.answer(wl, q, n, -np.inf, t)            # lambda = -inf: no refinement, overhead only
             ts.append(t["cheap"] + t["priority"] + t["topk"])
         over[n] = float(np.median(ts))
-    t = {}
-    for q in fit:
-        e2e.answer(wl, q, "P0", -np.inf, t)
-    over["ALL"] = t["cheap"] / len(fit)
+    over["ALL"] = float(np.median([tic(lambda: (wl.inputs(q), wl.R(q), wl.C(q)))[0] for q in fit]))   # no cheap inference
     xs, ys = [], []
     for q in fit:
         n_rows = len(q["rows"])
