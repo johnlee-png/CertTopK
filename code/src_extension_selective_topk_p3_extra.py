@@ -26,6 +26,7 @@ import pandas as pd
 import src_extension_selective_topk_crc as crc
 from src_extension_selective_topk_order_select import plug_in
 from src_extension_selective_topk_pareto import F_GRID, miss_of
+from src_vldb_topk_ties import topk_mask_batch
 
 OUT = Path("paper/src_extension")
 VARIANTS = {"P3": (200, "iid"), "P3B50": (50, "iid"), "P3B100": (100, "iid"), "P3B400": (400, "iid"),
@@ -36,8 +37,7 @@ def p3_priority(uc, width, k, p2, B, sampler, rng):
     """1 - P(membership differs from the cheap top-k) under the simulated errors; ties broken by P2."""
     n = len(uc)
     ue_sim = uc[None, :] + width[None, :] * sampler(rng, B, n)
-    kth = -np.partition(-ue_sim, k - 1, axis=1)[:, k - 1:k]
-    in_sim = ue_sim >= kth
+    in_sim = topk_mask_batch(ue_sim, k)
     in_cheap = np.zeros(n, bool)
     in_cheap[crc.topk(uc, k)] = True
     flip = np.where(in_cheap[None, :], ~in_sim, in_sim).mean(axis=0)

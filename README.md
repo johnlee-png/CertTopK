@@ -17,9 +17,12 @@ John Heong Lee<sup>1,*</sup>, Dongho Park<sup>1,2</sup>, Ahyun Kim<sup>3</sup>, 
 
 This artifact lets a reader regenerate the tables and figures of the paper at three levels of effort.
 
-1. **From saved results (minutes, no data needed).** `code/make_tables.py` prints the numbers of Table 2, the measured columns
-   of Table 3, and the headline statistics; `code/make_paper_figs.py` and `code/make_concept_figs.py` redraw Figs. 1–5 into `figures/`.
-   The LLM outputs are saved (`results/selective_topk_llm_scores.csv`), so no LLM call is needed.
+1. **From saved results (minutes, no data needed).** `code/make_tables.py` prints the numbers of Table 2 and the headline
+   statistics; `code/src_vldb_e2e_hc_report.py hc` and `... llm_c1` print Table 3 (end-to-end times) from `results/e2e/`;
+   `code/src_vldb_auto_analysis.py` prints the comparison of fixed orders, the automatic choice, and the best order in
+   hindsight; `code/make_paper_figs.py` and `code/make_concept_figs.py` redraw the figures into `figures/`.
+   The LLM outputs are saved (`results/selective_topk_llm_scores.csv`, `results/selective_topk_llm_scores_c1.csv`), so no
+   LLM call is needed.
 2. **From the public data (hours).** Download the data sets below and rerun the experiment scripts listed per table.
 3. **Checks.** `code/check_definitions.py` runs 16 boundary-case checks of the definitions against the code (all pass);
    `code/export_splits.py` regenerates the splits and their SHA-256 hashes (`results/splits/summary.csv`).
@@ -64,7 +67,8 @@ All settings are in `code/src_extension_selective_topk_crc.py` (one `build_*` fu
 | CRC | smallest grid point with (m/(m+1))·mean envelope + 1/(m+1) ≤ ε, else +∞ |
 | LTT | p = min{exp(−m·KL(r̂‖ε)), e·P[Bin(m,ε) ≤ ⌈m r̂⌉]}; Hoeffding-only = first term; fixed-sequence testing from +∞ (`..._ltt.py`) |
 | Everest re-implementation | `..._everest.py`, `..._everest_parallel.py`, `..._everest_crc.py`, `..._everest_mdn.py` |
-| Automatic order choice | `..._order_select_final.py` (Auto-calls); Auto-time costs from `..._hc_time_v2.py` (Home Credit, fit-split profile) and `..._llm_profile_fit.py` (LC-LLM, fit split and 110 loans outside the data) |
+| Automatic order choice | Auto-calls: smallest fit-split plug-in calls among P0, PU, P1, TOPM, P2, P3, P3c, and Everest's order (`..._order_select_final.py`, `src_vldb_auto_extended.py`). Auto-time: smallest predicted time `overhead + a + b·calls` among P0, PU, P1, TOPM, P2, P3c, and refining everyone, with the costs profiled on fit queries of each configuration (`src_vldb_e2e_hc.py: profile, choose`) |
+| Ties | every top-k, including P3's simulated scenarios, returns exactly k candidates; ties at the cut-off go to the smaller index (`crc.topk`, `src_vldb_topk_ties.topk_mask_batch`) |
 
 ## Splits and queries
 
@@ -76,26 +80,41 @@ queries, and the SHA-256 of the assignment. `results/splits/<dataset>_seed0.csv.
 
 | Paper item | Script (`py -X utf8 code/<script> 20 <datasets> <workers>`) | Result files |
 |---|---|---|
-| Fig. 4(a), Sec. 5.2 | `src_extension_selective_topk_crc.py`, `..._ltt.py` | `selective_topk_crc_*`, `selective_topk_ltt_*` |
-| Fig. 4(b), Sec. 5.3 | `..._everest_parallel.py`, `..._everest_mdn.py` | `selective_topk_everest_*` |
-| Fig. 5, Sec. 5.4 | `..._pareto.py`, `..._p3_extra.py`, `..._p3c_curves.py` | `selective_topk_pareto_curves.csv`, `selective_topk_p3extra_curves.csv`, `selective_topk_p3c_curves.csv` |
-| Table 2, Secs. V-E–G | `..._everest_crc.py`, `..._lossaware.py`, `..._baselines.py`, `..._order_select_final.py` | `selective_topk_c5_*`, `selective_topk_everest_crc_*`, `selective_topk_order_select_final_*` |
+| Fig. 3(a), Sec. 5.2 | `src_extension_selective_topk_crc.py`, `..._ltt.py` | `selective_topk_crc_*`, `selective_topk_ltt_*` |
+| Fig. 3(b), Sec. 5.3 | `..._everest_parallel.py`, `..._everest_mdn.py` | `selective_topk_everest_*` |
+| Fig. 4, Sec. 5.4 | `..._pareto.py`, `..._p3_extra.py`, `..._p3c_curves.py` | `selective_topk_pareto_curves.csv`, `selective_topk_p3extra_curves.csv`, `selective_topk_p3c_curves.csv` |
+| Table 2, Secs. 5.5–5.7 | `..._everest_crc.py`, `..._lossaware.py`, `..._baselines.py`, `..._order_select_final.py` | `selective_topk_c5_*`, `selective_topk_everest_crc_*`, `selective_topk_order_select_final_*` |
+| Automatic choice with P0 and PU, Sec. 5.6 | `src_vldb_auto_extended.py`, then `src_vldb_auto_analysis.py` | `selective_topk_auto_ext_fitcalls.csv`, `auto_analysis_{cells,summary,overall,worst}.csv` |
+| Ties, Sec. 5.1 | reruns with `CERTTOPK_TIE_LOG` set, then `src_vldb_summarize_ties.py` | `tie_rates.csv` |
 | P3 ablations | `..._p3_extra.py` | `selective_topk_p3extra_*` |
-| Sec. 5.8 | `..._m_sensitivity.py`, `..._temporal.py`, `..._calfit.py` | `selective_topk_m_sensitivity_*`, `selective_topk_temporal_ieee.csv`, `selective_topk_calfit_*` |
-| Sec. 5.9 | `..._realized.py`, `..._predicate.py`, `..._crc_hc_sensitivity.py` | matching `selective_topk_*` files |
-| Table 3, Sec. 5.10 | `..._hc_time_v2.py`, `..._llm_orders.py`, `..._llm_pipeline.py`, `..._llm_profile_fit.py` | `selective_topk_hc_time_v2.*`, `selective_topk_llm_orders.csv`, `selective_topk_llm_pipeline.json`, `selective_topk_llm_profile_fit.*`, `selective_topk_auto_time_*.csv` |
-| Table 4, Sec. 5.11 | `..._llm_trial.py`, `..._llm_score.py`, `..._lc_llm_cost.py` | `selective_topk_llm_*`, `selective_topk_lc_llm_cost.json` |
+| Sec. 5.8 | `..._m_sensitivity.py`, `..._temporal.py`, `..._calfit.py`, `..._realized.py`, `..._predicate.py`, `..._crc_hc_sensitivity.py` | matching `selective_topk_*` files |
+| Table 3, Sec. 5.9 | `src_vldb_e2e_hc.py` (Home Credit: sizes 250/1,000/2,500 × index / DuckDB in memory / DuckDB over Parquet), `src_vldb_e2e_llm.py` (LC-LLM: sizes 100/250/500 × 1/4/8 concurrent requests), `src_vldb_e2e_hc_report.py` | `results/e2e/hc_*`, `results/e2e/llm_c1_*` |
+| LLM determinism, Sec. 5.9 | `src_vldb_llm_determinism.py`, `src_vldb_llm_rescore_c1.py` | `results/e2e/llm_determinism.csv`, `selective_topk_llm_scores_c1.csv` |
+| Sec. 5.10 | `..._llm_trial.py`, `..._llm_score.py`, `..._lc_llm_cost.py` | `selective_topk_llm_*`, `selective_topk_lc_llm_cost.json` |
 | Figures | `make_paper_figs.py`, `make_concept_figs.py` | `figures/*.pdf` |
 
-In `selective_topk_hc_time_v2.json` the profiled priority costs `pri_P2`, `pri_P3`, `pri_P3c` include one evaluation of
-ŝ; the paper's Model column subtracts it (own priority cost = `pri_*` − `scale`).
+`src_vldb_e2e.py` holds the single per-query function `answer` used for every timed number (cheap model → priority →
+selection → data access → expensive model → mixed top-k); refining everyone runs through the same function and access
+path, and the loss of each timed answer is recorded in the same loop. Earlier timing scripts (`..._hc_time_v2.py`,
+`..._hc_time_breakdown.py`, `..._llm_orders.py`, `..._llm_pipeline.py`, `..._llm_profile_fit.py`, and their result
+files, including `selective_topk_auto_time_*.csv`) are superseded by this protocol and kept for reference only.
+`results/e2e/llm_queries.csv`, `llm_summary.csv`, and `llm_moretest_queries.csv` are an earlier run against the logged
+concurrency-8 scores, superseded by `llm_c1_*`.
 
 ## LLM case
 
 Qwen2.5-7B-Instruct, Q4_K_M GGUF, served by llama.cpp:
 `llama-server -m Qwen2.5-7B-Instruct-Q4_K_M.gguf -ngl 99 -c 16384 -np 8 --port 8091`. The prompt and the read-out (sum
 of the probabilities of "Yes"/"No" surface tokens among the top 20 of the first answer token, temperature 0) are
-`prompt` and `ask` in `code/src_extension_selective_topk_llm_trial.py`; eight concurrent requests. The scores of all
-125,281 loans are saved in `results/selective_topk_llm_scores.csv` (`id, p_llm_yes, prompt_tokens`), so the LC-LLM
-workload and its tables can be rebuilt without running the LLM; only the wall-clock measurements of Table 3 need the
-server.
+`prompt` and `ask` in `code/src_extension_selective_topk_llm_trial.py`. The scores of all 125,281 loans are saved
+(`id, p_llm_yes, prompt_tokens`), so the LC-LLM workload and its tables can be rebuilt without running the LLM; only
+the wall-clock measurements of Table 3 need the server.
+
+* `results/selective_topk_llm_scores.csv`: one scoring pass with eight concurrent requests, the oracle of the 20-seed
+  experiments (Sec. 5.10; refining reads these stored scores, so full refinement reproduces the reference).
+* `results/selective_topk_llm_scores_c1.csv`: one request at a time. The server is deterministic only then
+  (`results/e2e/llm_determinism.csv`: repeated runs differ by 0.40 in mean absolute logit at concurrency 8, by 0 at
+  concurrency 1), so the end-to-end runs train, calibrate, and define the reference with these scores
+  (`CERTTOPK_LLM_SCORES=paper/src_extension/selective_topk_llm_scores_c1.csv`); at concurrency 1 the online outputs
+  equal the stored ones and refining everyone has loss 0. Runs at concurrency 4 and 8 measure speed and robustness
+  against the same reference.

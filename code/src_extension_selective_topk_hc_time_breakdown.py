@@ -23,6 +23,7 @@ import src_extension_selective_topk_crc as crc
 from src_extension_selective_topk_baselines import topk_mask
 from src_extension_selective_topk_homecredit import prepare
 from src_extension_selective_topk_homecredit_index import OffsetIndex
+from src_vldb_topk_ties import flip_prob
 
 SEED, K_FRAC, B = 0, 0.10, 200
 OUT = Path("paper/src_extension/selective_topk_hc_time_breakdown.csv")
@@ -59,8 +60,7 @@ def priorities(d, U_c, s, su, z_all, rng, names):
         if "P3c" in names:
             p_sim = d["pc"][ix][None, :] + s[ix][None, :] * rng.choice(z_all, size=(B, len(ix)))
             u_sim = np.clip(p_sim, 0, 1) * budget[None, :] - d["C"][ix][None, :]
-            kth = -np.partition(-u_sim, k - 1, axis=1)[:, k - 1:k]
-            flip = np.where(topk_mask(uc, k)[None, :], u_sim < kth, u_sim >= kth).mean(axis=0)
+            flip = flip_prob(u_sim, topk_mask(uc, k), k)
             out["P3c"][ix] = 1.0 - flip + 1e-6 * p2 / (p2.max() + 1e-12)
     return out
 

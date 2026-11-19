@@ -40,6 +40,7 @@ calibration or test queries, which keeps them exchangeable.
 Repeated over SEEDS. Existing scripts and result files are not modified.
 """
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -382,7 +383,8 @@ def build_lending_club(seed):
     return build_tabular(groups, df["repaid"].to_numpy(), Xc, Xf, R, lgd * amt, 5000, seed)
 
 
-LLM_SCORES = Path("paper/src_extension/selective_topk_llm_scores.csv")
+# CERTTOPK_LLM_SCORES selects another scoring run of the same loans (e.g. the deterministic concurrency-1 run)
+LLM_SCORES = Path(os.environ.get("CERTTOPK_LLM_SCORES", "paper/src_extension/selective_topk_llm_scores.csv"))
 LC_LLM_ROWS = 500
 _LCL = None
 

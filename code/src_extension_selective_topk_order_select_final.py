@@ -21,6 +21,7 @@ import src_extension_selective_topk_crc as crc
 from src_extension_selective_topk_order_select import plug_in
 from src_extension_selective_topk_p3_extra import arrays, iid_sampler, p3_priority
 from src_extension_selective_topk_baselines import topk_mask
+from src_vldb_topk_ties import flip_prob
 
 OUT = Path("paper/src_extension")
 B = 200
@@ -46,8 +47,7 @@ def task(args):
             q["pri"]["P3"] = p3_priority(q["uc"], width[ix], k, q["pri"]["P2"], B, iid_sampler(z_all), rng)
             p_sim = f["pc"][ix][None, :] + s_all[ix][None, :] * rng_c.choice(z_all, size=(B, len(ix)))
             u_sim = np.clip(p_sim, 0, 1) * (f["R"] + f["C"])[ix][None, :] - f["C"][ix][None, :]
-            kth = -np.partition(-u_sim, k - 1, axis=1)[:, k - 1:k]
-            flip = np.where(topk_mask(q["uc"], k)[None, :], u_sim < kth, u_sim >= kth).mean(axis=0)
+            flip = flip_prob(u_sim, topk_mask(q["uc"], k), k)
             p2 = q["pri"]["P2"]
             q["pri"]["P3CLIP"] = 1.0 - flip + 1e-6 * p2 / (p2.max() + 1e-12)
         r = {eps: {} for eps in crc.EPSILONS}

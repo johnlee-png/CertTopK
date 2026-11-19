@@ -15,6 +15,7 @@ import src_extension_selective_topk_crc as crc
 from src_extension_selective_topk_baselines import topk_mask
 from src_extension_selective_topk_p3_extra import arrays
 from src_extension_selective_topk_pareto import F_GRID, miss_of
+from src_vldb_topk_ties import flip_prob
 
 OUT = Path("paper/src_extension/selective_topk_p3c_curves.csv")
 B = 200
@@ -38,8 +39,7 @@ def task(args):
             ix, k = q["_ix"], q["k"]
             p_sim = d["pc"][ix][None, :] + s_all[ix][None, :] * rng.choice(z_all, size=(B, len(ix)))
             u_sim = np.clip(p_sim, 0, 1) * (d["R"][ix] + d["C"][ix])[None, :] - d["C"][ix][None, :]
-            kth = -np.partition(-u_sim, k - 1, axis=1)[:, k - 1:k]
-            flip = np.where(topk_mask(q["uc"], k)[None, :], u_sim < kth, u_sim >= kth).mean(axis=0)
+            flip = flip_prob(u_sim, topk_mask(q["uc"], k), k)
             p2 = q["pri"]["P2"]
             pri = 1.0 - flip + 1e-6 * p2 / (p2.max() + 1e-12)
             ref = set(crc.topk(q["ue"], k).tolist())

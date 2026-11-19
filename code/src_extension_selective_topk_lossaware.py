@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 
 import src_extension_selective_topk_crc as crc
+from src_vldb_topk_ties import topk_mask_batch
 
 OUT = Path("paper/src_extension")
 NS = 200
@@ -42,8 +43,7 @@ def add_p3(qs, d, scale, z_pool, k_frac, rng):
         uc = q["uc"]
         n = len(uc)
         ue_sim = uc[None, :] + (budget[ix] * s_all[ix])[None, :] * rng.choice(z_pool, size=(NS, n))
-        kth = -np.partition(-ue_sim, k - 1, axis=1)[:, k - 1:k]
-        in_sim = ue_sim >= kth
+        in_sim = topk_mask_batch(ue_sim, k)
         in_cheap = np.zeros(n, bool)
         in_cheap[crc.topk(uc, k)] = True
         flip = np.where(in_cheap[None, :], ~in_sim, in_sim).mean(axis=0)
