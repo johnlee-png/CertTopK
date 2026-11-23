@@ -209,9 +209,12 @@ def main():
             wl.conc = conc
             t_prof, prof = tic(lambda: hc.profile(wl, qs, n_q=2))
             cinfo = {"profiling_s": t_prof, "profile": prof, "choice": {}}
+            t_val, vtimes = tic(lambda: hc.validate(wl, qs, state, n_v=3, skip=2))
+            cinfo["validation_s"] = t_val
             for eps in crc.EPSILONS:
                 a_calls, a_time, pred = hc.choose(state, prof, size, eps)
-                cinfo["choice"][str(eps)] = {"auto_calls": a_calls, "auto_time": a_time, "predicted_s": pred}
+                cinfo["choice"][str(eps)] = {"auto_calls": a_calls, "auto_time": a_time, "predicted_s": pred,
+                                             **hc.guarded_choice(vtimes, pred, eps)}
             info["conc"][str(conc)] = cinfo
             for pol in POLICIES:
                 test = qs["test"][:N_ALL if pol == "ALL" else N_TEST]

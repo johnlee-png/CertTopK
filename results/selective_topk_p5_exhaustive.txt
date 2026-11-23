@@ -1,0 +1,4 @@
+n=3, values 0..3: done
+n=4, values 0..3: done
+n=5, values 0..2: done
+bound holds in all 10,769,536 (score vectors, k, S) cases; equality in 5,122,808; max form holds too, equality in 6,720,858; degenerate cut-off (k-th = (k+1)-th expensive score) in 5,875,264

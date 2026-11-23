@@ -209,6 +209,32 @@ def profile(wl, qs, n_q=5):
     return {"overhead": over, "exp_a": float(max(a, 0.0)), "exp_b": float(b)}
 
 
+def validate(wl, qs, state, n_v=3, skip=5):
+    """Measured time of every candidate (each order at its calibrated threshold for each eps, and ALL) on n_v fit
+    queries that the profile did not use; per candidate, the per-query times. No test query is touched."""
+    val = qs["fit"][skip:skip + n_v] if len(qs["fit"]) >= skip + n_v else qs["fit"][:n_v]
+    times = {("ALL", None): [tic(lambda: e2e.answer(wl, q, "ALL", np.inf))[0] for q in val]}
+    for n in e2e.ORDERS:
+        for eps in crc.EPSILONS:
+            lam = state[n]["lam"][eps]
+            times[(n, eps)] = [tic(lambda: e2e.answer(wl, q, n, lam))[0] for q in val]
+    return times
+
+
+def guarded_choice(times, pred, eps):
+    """Guarded Auto-time (Proposition 2) with R_bar estimated on the validation queries, and the choice by measured
+    validation time. R_bar = max / min ratio of measured to predicted time over candidates and validation queries
+    (per-query extremes, so it is conservative)."""
+    cand = ["ALL"] + list(e2e.ORDERS)
+    meas = {j: np.array(times[("ALL", None)] if j == "ALL" else times[(j, eps)]) for j in cand}
+    ratios = np.concatenate([meas[j] / pred[j] for j in cand])
+    r_bar = float(ratios.max() / ratios.min())
+    a_time = min(pred, key=pred.get)
+    guarded = a_time if a_time == "ALL" or r_bar * pred[a_time] <= pred["ALL"] else "ALL"
+    mean = {j: float(meas[j].mean()) for j in cand}
+    return {"R_bar": r_bar, "guarded": guarded, "auto_val": min(mean, key=mean.get), "val_s": mean}
+
+
 def choose(state, prof, size, eps):
     calls = {n: state[n]["fit_calls"][eps] for n in e2e.ORDERS}
     pred = {n: prof["overhead"][n] + (prof["exp_a"] if calls[n] > 0 else 0.0) + prof["exp_b"] * calls[n] * size
@@ -251,9 +277,12 @@ def main():
                     fresh += tic(lambda: wl.expensive(q, np.arange(len(q["rows"])), X))[0]
             t_prof, prof = tic(lambda: profile(wl, qs))
             pinfo = {"fresh_expensive_outputs_s": fresh, "profiling_s": t_prof, "profile": prof, "choice": {}}
+            t_val, vtimes = tic(lambda: validate(wl, qs, state))
+            pinfo["validation_s"] = t_val
             for eps in crc.EPSILONS:
                 a_calls, a_time, pred = choose(state, prof, size, eps)
-                pinfo["choice"][str(eps)] = {"auto_calls": a_calls, "auto_time": a_time, "predicted_s": pred}
+                pinfo["choice"][str(eps)] = {"auto_calls": a_calls, "auto_time": a_time, "predicted_s": pred,
+                                             **guarded_choice(vtimes, pred, eps)}
             info["paths"][path] = pinfo
             for pol in POLICIES:
                 for eps in ([np.nan] if pol == "ALL" else crc.EPSILONS):

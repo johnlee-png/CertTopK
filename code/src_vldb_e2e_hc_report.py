@@ -71,13 +71,15 @@ def main():
             ch = pp["choice"][str(eps)]
             best = se.mean_s.idxmin()
             for lab, pol in [("ALL", None)] + [(o, o) for o in se.index] + \
-                            [("Auto-calls", ch["auto_calls"]), ("Auto-time", ch["auto_time"]), ("post-hoc best", best)]:
-                r = all_row if pol is None else se.loc[pol]
+                            [("Auto-calls", ch["auto_calls"]), ("Auto-time", ch["auto_time"])] + \
+                            [(lab, ch[key]) for lab, key in (("Guarded", "guarded"), ("Auto-val", "auto_val"))
+                             if key in ch] + [("post-hoc best", best)]:
+                r = all_row if pol in (None, "ALL") else se.loc[pol]
                 rows.append({"size": size, DIM: path, "eps": eps, "policy": lab, "order": pol or "ALL",
                              **{c: r[c] for c in ("mean_s", "p95_s", "qps", "calls", "call_frac", "loss", "loss_max")},
                              "speedup_vs_all": all_row.mean_s / r.mean_s,
                              "pred_s": ch["predicted_s"].get(pol or "ALL", np.nan)})
-                if lab in ("Auto-calls", "Auto-time"):
+                if lab in ("Auto-calls", "Auto-time", "Guarded", "Auto-val"):
                     gain = all_row.mean_s - r.mean_s
                     be.append({"size": size, DIM: path, "eps": eps, "rule": lab, "order": pol,
                                "gain_per_query_s": gain, "init_reuse_s": reuse, "init_fresh_s": fresh,

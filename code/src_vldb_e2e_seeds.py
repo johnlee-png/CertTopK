@@ -13,7 +13,7 @@ import pandas as pd
 D = Path("paper/src_extension/e2e")
 RUNS = [("hc", "path", s, "hc" if s == 0 else f"hc_s{s}") for s in range(5)] + \
        [("llm", "conc", s, "llm_c1" if s == 0 else f"llm_c1_s{s}") for s in range(3)]
-RULES = ["Auto-calls", "Auto-time", "post-hoc best"]
+RULES = ["Auto-calls", "Auto-time", "Guarded", "Auto-val", "post-hoc best"]
 
 
 def main():
@@ -23,6 +23,7 @@ def main():
         for (size, v, eps), g in s[s.eps >= 0].groupby(["size", dim, "eps"]):
             g = g.set_index("policy")
             base = g.drop(index=RULES, errors="ignore")
+            best = g.loc["post-hoc best", "mean_s"]
             r = base.mean_s / base.pred_s
             R = float(r.max() / r.min())
             rec = {"wl": wl, "seed": seed, "size": size, "cfg": v, "eps": eps, "R": R,
@@ -33,7 +34,10 @@ def main():
                    "at_order": g.loc["Auto-time", "order"], "ac_order": g.loc["Auto-calls", "order"],
                    "at_loss": g.loc["Auto-time", "loss"]}
             for p in ["P0", "P2", "P3c", "P5"] + RULES:
-                rec[f"sp_{p}"] = g.loc[p, "speedup_vs_all"]
+                rec[f"sp_{p}"] = g.loc[p, "speedup_vs_all"] if p in g.index else np.nan
+            for p in ("Guarded", "Auto-val"):
+                rec[f"excess_{p}"] = g.loc[p, "mean_s"] / best - 1 if p in g.index else np.nan
+                rec[f"order_{p}"] = g.loc[p, "order"] if p in g.index else None
             rec["within_R"] = g.loc["Auto-time", "mean_s"] <= R * g.loc["post-hoc best", "mean_s"] * (1 + 1e-9)
             rows.append(rec)
     long = pd.DataFrame(rows)
