@@ -15,6 +15,7 @@ Writes paper/src_extension/e2e/hc_{queries.csv,setup.json}.
 Usage: py src_vldb_e2e_hc.py [sizes] [paths] [max_test_queries]
 """
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -29,7 +30,8 @@ import src_vldb_e2e as e2e
 from src_extension_selective_topk_homecredit import CHILD, CLEAN, expensive_features, prepare
 from src_extension_selective_topk_homecredit_index import OffsetIndex
 
-SEED, K_FRAC = 0, 0.10
+SEED, K_FRAC = int(os.environ.get("CERTTOPK_SEED", 0)), 0.10
+TAG = "hc" if SEED == 0 else f"hc_s{SEED}"          # output name prefix
 OUT = Path("paper/src_extension/e2e")
 POLICIES = ["ALL"] + e2e.ORDERS
 
@@ -159,7 +161,7 @@ def offline_query(wl, q, names):
     s, su = wl.scale(q, pc, X), wl.su(q, pc, X)
     pri = {}
     for n in names:
-        rng = np.random.default_rng([wl.seed, 777, wl.qkey(q)]) if n == "P3c" else None
+        rng = np.random.default_rng([wl.seed, 777, wl.qkey(q)]) if n in ("P3c", "P5") else None
         pri[n] = e2e.priority(n, uc, k, R, C, pc, s, su, wl.z_all, rng)
     return {"uc": uc, "ue": ue, "k": k, "pri": pri}
 
@@ -271,10 +273,10 @@ def main():
                     print(f"size {size} {path} {pol} eps {eps}: mean {sub.latency_s.mean():.4f}s "
                           f"p95 {sub.latency_s.quantile(.95):.4f}s calls {sub.calls.mean() / size:.3f} "
                           f"loss {sub.loss.mean():.4f}", flush=True)
-            pd.DataFrame(rows).to_csv(OUT / "hc_queries.csv", index=False)
+            pd.DataFrame(rows).to_csv(OUT / f"{TAG}_queries.csv", index=False)
         per_size[str(size)] = info
         setup["per_size"] = per_size
-        (OUT / "hc_setup.json").write_text(json.dumps(setup, indent=2, default=float))
+        (OUT / f"{TAG}_setup.json").write_text(json.dumps(setup, indent=2, default=float))
 
 
 if __name__ == "__main__":

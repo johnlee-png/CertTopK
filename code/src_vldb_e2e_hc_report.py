@@ -18,7 +18,7 @@ import pandas as pd
 
 D = Path("paper/src_extension/e2e")
 WL = sys.argv[1] if len(sys.argv) > 1 else "hc"
-DIM, SUB = ("path", "paths") if WL == "hc" else ("conc", "conc")
+DIM, SUB = ("path", "paths") if WL.startswith("hc") else ("conc", "conc")
 
 
 def variability(q, out, n_boot=2000, seed=0):
@@ -92,7 +92,7 @@ def main():
         print(key[["size", DIM, "eps", "policy", "order", "mean_s", "p95_s", "calls", "loss", "speedup_vs_all",
                    "pred_s"]].round(4).to_string(index=False))
         print(be.round(3).to_string(index=False))
-        print("setup:", {k: round(v, 2) for k, v in setup.items() if not isinstance(v, dict)})
+        print("setup:", {k: round(v, 2) for k, v in setup.items() if isinstance(v, (int, float))})
 
 
 if __name__ == "__main__":

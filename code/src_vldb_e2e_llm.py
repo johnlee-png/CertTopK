@@ -19,6 +19,7 @@ Writes paper/src_extension/e2e/llm_{queries.csv,setup.json,fresh_scores.csv}.
 Usage: py src_vldb_e2e_llm.py [sizes] [concs] [n_test] [n_all] [--no-fresh] [--tag=suffix]
 """
 import json
+import os
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -37,7 +38,7 @@ sys.argv = _argv
 import src_vldb_e2e as e2e
 
 trial.PORT = 8091
-SEED, K_FRAC = 0, 0.10
+SEED, K_FRAC = int(os.environ.get("CERTTOPK_SEED", 0)), 0.10
 args = [a for a in sys.argv[1:] if not a.startswith("--")]
 SIZES = [int(x) for x in args[0].split(",")] if len(args) > 0 else [100, 250, 500]
 CONCS = [int(x) for x in args[1].split(",")] if len(args) > 1 else [1, 4, 8]

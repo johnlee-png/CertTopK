@@ -14,10 +14,10 @@ import time
 import numpy as np
 
 import src_extension_selective_topk_crc as crc
-from src_vldb_topk_ties import flip_prob
+from src_vldb_topk_ties import flip_prob, topk_mask_batch
 
-ORDERS = ["P0", "P1", "PU", "TOPM", "P2", "P3c"]
-NEEDS_SCALE = {"P2", "P3c"}
+ORDERS = ["P0", "P1", "PU", "TOPM", "P2", "P3c", "P5"]
+NEEDS_SCALE = {"P2", "P3c", "P5"}
 NEEDS_SU = {"PU"}
 B = 200
 
@@ -44,12 +44,19 @@ def priority(name, uc, k, R, C, pc=None, s=None, su=None, z_all=None, rng=None):
     p2 = dist / (budget * s)
     if name == "P2":
         return p2
+    p_sim = np.clip(pc[None, :] + s[None, :] * rng.choice(z_all, size=(B, len(uc))), 0, 1)
+    u_sim = p_sim * budget[None, :] - C[None, :]
+    tie = 1e-6 * p2 / (p2.max() + 1e-12)
     if name == "P3c":
-        p_sim = np.clip(pc[None, :] + s[None, :] * rng.choice(z_all, size=(B, len(uc))), 0, 1)
-        u_sim = p_sim * budget[None, :] - C[None, :]
         in_cheap = np.zeros(len(uc), bool)
         in_cheap[crc.topk(uc, k)] = True
-        return 1.0 - flip_prob(u_sim, in_cheap, k) + 1e-6 * p2 / (p2.max() + 1e-12)
+        return 1.0 - flip_prob(u_sim, in_cheap, k) + tie
+    if name == "P5":                                       # wrong side of the scenario's expensive cut-off
+        part = -np.partition(-u_sim, [k - 1, k], axis=1)
+        theta = 0.5 * (part[:, k - 1:k] + part[:, k:k + 1])
+        ref = topk_mask_batch(u_sim, k)
+        wrong = np.where(ref, uc[None, :] <= theta, uc[None, :] >= theta)
+        return 1.0 - wrong.mean(axis=0) + tie
     raise ValueError(name)
 
 
@@ -73,7 +80,7 @@ def answer(wl, q, policy, lam, timings=None):
     else:
         s = wl.scale(q, pc, aux) if policy in NEEDS_SCALE else None
         su = wl.su(q, pc, aux) if policy in NEEDS_SU else None
-        rng = np.random.default_rng([wl.seed, 777, wl.qkey(q)]) if policy == "P3c" else None
+        rng = np.random.default_rng([wl.seed, 777, wl.qkey(q)]) if policy in ("P3c", "P5") else None
         pri = priority(policy, uc, k, R, C, pc, s, su, wl.z_all, rng)
         sel = np.flatnonzero(pri <= lam)
     t2 = tic()
