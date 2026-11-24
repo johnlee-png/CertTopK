@@ -69,7 +69,7 @@ All settings are in `code/src_extension_selective_topk_crc.py` (one `build_*` fu
 | CRC | smallest grid point with (m/(m+1))·mean envelope + 1/(m+1) ≤ ε, else +∞ |
 | LTT | p = min{exp(−m·KL(r̂‖ε)), e·P[Bin(m,ε) ≤ ⌈m r̂⌉]}; Hoeffding-only = first term; fixed-sequence testing from +∞ (`..._ltt.py`) |
 | Everest re-implementation | `..._everest.py`, `..._everest_parallel.py`, `..._everest_crc.py`, `..._everest_mdn.py` |
-| Automatic order choice | Auto-calls: smallest fit-split plug-in calls among P0, PU, P1, TOPM, P2, P3, P3c, P5, and Everest's order (`..._order_select_final.py`, `src_vldb_auto_extended.py`). Auto-time: smallest predicted time `overhead + a + b·calls` among P0, PU, P1, TOPM, P2, P3c, P5, and refining everyone. Safeguards that use only fit queries (`validate`, `guarded_choice` in `src_vldb_e2e_hc.py`): Guarded (Proposition 2 with R̄ measured on three further fit queries) and Auto-val (smallest measured time on those queries), with the costs profiled on fit queries of each configuration (`src_vldb_e2e_hc.py: profile, choose`) |
+| Automatic order choice | Auto-calls: smallest fit-split plug-in calls among P0, PU, P1, TOPM, P2, P3, P3c, P5, and Everest's order (`..._order_select_final.py`, `src_vldb_auto_extended.py`). Auto-time: smallest predicted time `overhead + a + b·calls` among P0, PU, P1, TOPM, P2, P3c, P5, and refining everyone. Safeguards that use only fit queries (`validate`, `guarded_choice` in `src_vldb_e2e_hc.py`): each order runs at its fit-only threshold (`e2e.plug_in_lambda`) on three further fit queries; Auto-val picks the fastest, Guarded applies Proposition 2 with R̄ estimated from those runs (a heuristic, not a valid bound). The chosen order is then calibrated with CRC; no choice uses calibration or test queries (Algorithm 2 of the paper), with the costs profiled on fit queries of each configuration (`src_vldb_e2e_hc.py: profile, choose`) |
 | Ties | every top-k, including P3's simulated scenarios, returns exactly k candidates; ties at the cut-off go to the smaller index (`crc.topk`, `src_vldb_topk_ties.topk_mask_batch`) |
 
 ## Splits and queries
@@ -85,17 +85,18 @@ queries, and the SHA-256 of the assignment. `results/splits/<dataset>_seed0.csv.
 | Fig. 3(a), Sec. 5.2 | `src_extension_selective_topk_crc.py`, `..._ltt.py` | `selective_topk_crc_*`, `selective_topk_ltt_*` |
 | Fig. 3(b), Sec. 5.3 | `..._everest_parallel.py`, `..._everest_mdn.py` | `selective_topk_everest_*` |
 | Equal-call curves (`figures/fig_pareto.pdf`, artifact only), Sec. 5.4 | `..._pareto.py`, `..._p3_extra.py`, `..._p3c_curves.py`, `src_vldb_p4.py` | `selective_topk_pareto_curves.csv`, `selective_topk_p3extra_curves.csv`, `selective_topk_p3c_curves.csv` |
-| Table 2, Secs. 5.5–5.7 | `..._everest_crc.py`, `..._lossaware.py`, `..._baselines.py`, `..._order_select_final.py` | `selective_topk_c5_*`, `selective_topk_everest_crc_*`, `selective_topk_order_select_final_*` |
-| Bound tightness and when P5 differs from P3c, Sec. 5.6 | `src_vldb_p5_tightness.py 5 <datasets> <workers>`; `src_vldb_p5_exhaustive.py` | `selective_topk_p5_tightness*.csv`, `selective_topk_p5_exhaustive.txt` |
-| P5, P4, P5T vs P3c (Table 2, Sec. 5.6) | `src_vldb_p4.py 20 <datasets> <workers>`; P5T: `P4_ORDERS=P3CLIP,P5,P5T P4_TAG=p5t` | `selective_topk_p4_*`, `selective_topk_p5t_*` |
-| Automatic choice with P0, PU, and P5, Sec. 5.6 | `src_vldb_auto_extended.py`, then `src_vldb_auto_analysis.py` | `selective_topk_auto_ext_fitcalls.csv`, `auto_analysis_{cells,summary,overall,worst}.csv` |
+| Table 2, Secs. 5.5–5.6 | `..._everest_crc.py`, `..._lossaware.py`, `..._baselines.py`, `..._order_select_final.py` | `selective_topk_c5_*`, `selective_topk_everest_crc_*`, `selective_topk_order_select_final_*` |
+| Bound tightness and when P5 differs from P3c, Sec. 5.5 | `src_vldb_p5_tightness.py 5 <datasets> <workers>`; `src_vldb_p5_exhaustive.py` | `selective_topk_p5_tightness*.csv`, `selective_topk_p5_exhaustive.txt` |
+| P5 vs P3c on soccer, seed-blocked test (Sec. 5.5) | `src_vldb_p5_seedblock.py soccer` | `selective_topk_p5_seedblock.txt` |
+| P5, P4, P5T vs P3c (Table 2, Sec. 5.5) | `src_vldb_p4.py 20 <datasets> <workers>`; P5T: `P4_ORDERS=P3CLIP,P5,P5T P4_TAG=p5t` | `selective_topk_p4_*`, `selective_topk_p5t_*` |
+| Automatic choice with P0, PU, and P5, Sec. 5.5 | `src_vldb_auto_extended.py`, then `src_vldb_auto_analysis.py` | `selective_topk_auto_ext_fitcalls.csv`, `auto_analysis_{cells,summary,overall,worst}.csv` |
 | Ties, Sec. 5.1 | reruns with `CERTTOPK_TIE_LOG` set, then `src_vldb_summarize_ties.py` | `tie_rates.csv` |
 | P3 ablations | `..._p3_extra.py` | `selective_topk_p3extra_*` |
-| Realized utility, Sec. 5.8 | `..._realized.py`, then `src_vldb_realized_stats.py` (paired over seeds) | `selective_topk_realized_*` |
-| Sec. 5.8 | `..._m_sensitivity.py`, `..._temporal.py`, `..._calfit.py`, `..._realized.py`, `..._predicate.py`, `..._crc_hc_sensitivity.py` | matching `selective_topk_*` files |
-| Table 3, Sec. 5.9 (seeds via `CERTTOPK_SEED`; across-seed summary `src_vldb_e2e_seeds.py` → `e2e/e2e_seeds_*.csv`) | `src_vldb_e2e_hc.py` (Home Credit: sizes 250/1,000/2,500 × index / DuckDB in memory / DuckDB over Parquet), `src_vldb_e2e_llm.py` (LC-LLM: sizes 100/250/500 × 1/4/8 concurrent requests), `src_vldb_e2e_hc_report.py` | `results/e2e/hc_*`, `results/e2e/llm_c1_*` |
-| LLM determinism, Sec. 5.9 | `src_vldb_llm_determinism.py`, `src_vldb_llm_rescore_c1.py` | `results/e2e/llm_determinism.csv`, `selective_topk_llm_scores_c1.csv` |
-| Sec. 5.10 | `..._llm_trial.py`, `..._llm_score.py`, `..._lc_llm_cost.py` | `selective_topk_llm_*`, `selective_topk_lc_llm_cost.json` |
+| Realized utility, Sec. 5.7 | `..._realized.py`, then `src_vldb_realized_stats.py` (paired over seeds) | `selective_topk_realized_*` |
+| Sec. 5.7 | `..._m_sensitivity.py`, `..._temporal.py`, `..._calfit.py`, `..._realized.py`, `..._predicate.py`, `..._crc_hc_sensitivity.py` | matching `selective_topk_*` files |
+| Table 3, Sec. 5.8 (seeds via `CERTTOPK_SEED`; across-seed summary `src_vldb_e2e_seeds.py` → `e2e/e2e_seeds_*.csv`) | `src_vldb_e2e_hc.py` (Home Credit: sizes 250/1,000/2,500 × index / DuckDB in memory / DuckDB over Parquet), `src_vldb_e2e_llm.py` (LC-LLM: sizes 100/250/500 × 1/4/8 concurrent requests), `src_vldb_e2e_hc_report.py` | `results/e2e/hc_*`, `results/e2e/llm_c1_*` |
+| LLM determinism, Sec. 5.8 | `src_vldb_llm_determinism.py`, `src_vldb_llm_rescore_c1.py` | `results/e2e/llm_determinism.csv`, `selective_topk_llm_scores_c1.csv` |
+| Sec. 5.9 | `..._llm_trial.py`, `..._llm_score.py`, `..._lc_llm_cost.py` | `selective_topk_llm_*`, `selective_topk_lc_llm_cost.json` |
 | Figures | `make_paper_figs.py`, `make_concept_figs.py` | `figures/*.pdf` |
 
 `src_vldb_e2e.py` holds the single per-query function `answer` used for every timed number (cheap model → priority →
@@ -117,7 +118,7 @@ of the probabilities of "Yes"/"No" surface tokens among the top 20 of the first 
 the wall-clock measurements of Table 3 need the server.
 
 * `results/selective_topk_llm_scores.csv`: one scoring pass with eight concurrent requests, the oracle of the 20-seed
-  experiments (Sec. 5.10; refining reads these stored scores, so full refinement reproduces the reference).
+  experiments (Sec. 5.9; refining reads these stored scores, so full refinement reproduces the reference).
 * `results/selective_topk_llm_scores_c1.csv`: one request at a time. The server is deterministic only then
   (`results/e2e/llm_determinism.csv`: repeated runs differ by 0.40 in mean absolute logit at concurrency 8, by 0 at
   concurrency 1), so the end-to-end runs train, calibrate, and define the reference with these scores

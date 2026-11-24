@@ -1,0 +1,9 @@
+soccer: settings with a reduction 111/120; seeds 20/20
+seed-level mean -0.0615, t 95% [-0.0665, -0.0566], bootstrap 95% [-0.0662, -0.0570]
+Wilcoxon p = 1.9e-06, sign test p = 1.9e-06
+  kappa 0.05, eps 0.05: mean -0.009, seeds lower 12/20
+  kappa 0.05, eps 0.1: mean -0.047, seeds lower 19/20
+  kappa 0.1, eps 0.05: mean -0.067, seeds lower 20/20
+  kappa 0.1, eps 0.1: mean -0.117, seeds lower 20/20
+  kappa 0.2, eps 0.05: mean -0.046, seeds lower 20/20
+  kappa 0.2, eps 0.1: mean -0.084, seeds lower 20/20

@@ -122,6 +122,12 @@ def crc_lambda(env, grid, eps):
     return grid[ok[0]] if len(ok) else np.inf
 
 
+def plug_in_lambda(env_fit, grid, eps):
+    """Fit-only threshold: first grid point whose mean fit-query envelope is <= eps (no calibration data)."""
+    ok = np.flatnonzero(env_fit.mean(axis=0) <= eps)
+    return grid[ok[0]] if len(ok) else np.inf
+
+
 def plug_in_calls(env_fit, frac_fit, eps):
     ok = np.flatnonzero(env_fit.mean(axis=0) <= eps)
     j = ok[0] if len(ok) else env_fit.shape[1] - 1

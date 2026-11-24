@@ -178,6 +178,7 @@ def calibrate(wl, qs):
         env_f, frac_f = e2e.curves(fit, n, grid)
         env_c, _ = e2e.curves(cal, n, grid)
         state[n] = {"lam": {eps: e2e.crc_lambda(env_c, grid, eps) for eps in crc.EPSILONS},
+                    "lam_fit": {eps: e2e.plug_in_lambda(env_f, grid, eps) for eps in crc.EPSILONS},
                     "fit_calls": {eps: e2e.plug_in_calls(env_f, frac_f, eps) for eps in crc.EPSILONS}}
         secs[n] = time.perf_counter() - t0
     return state, secs
@@ -210,13 +211,15 @@ def profile(wl, qs, n_q=5):
 
 
 def validate(wl, qs, state, n_v=3, skip=5):
-    """Measured time of every candidate (each order at its calibrated threshold for each eps, and ALL) on n_v fit
-    queries that the profile did not use; per candidate, the per-query times. No test query is touched."""
+    """Measured time of every candidate (each order at its fit-only threshold for each eps, and ALL) on n_v fit
+    queries that the profile did not use; per candidate, the per-query times. Neither calibration nor test queries are
+    touched, so the choice made from these times depends on the fit data only and the chosen order is then calibrated
+    with CRC as any order fixed in advance (Algorithm 2)."""
     val = qs["fit"][skip:skip + n_v] if len(qs["fit"]) >= skip + n_v else qs["fit"][:n_v]
     times = {("ALL", None): [tic(lambda: e2e.answer(wl, q, "ALL", np.inf))[0] for q in val]}
     for n in e2e.ORDERS:
         for eps in crc.EPSILONS:
-            lam = state[n]["lam"][eps]
+            lam = state[n]["lam_fit"][eps]
             times[(n, eps)] = [tic(lambda: e2e.answer(wl, q, n, lam))[0] for q in val]
     return times
 
