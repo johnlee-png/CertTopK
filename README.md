@@ -4,12 +4,13 @@ Code, results, and scripts for the paper submitted to PVLDB Vol. 20 (VLDB 2027).
 
 ## Authors
 
-John Heong Lee<sup>1,*</sup>, Dongho Park<sup>1,2</sup>, Ahyun Kim<sup>3</sup>, Charles Cheolgi Lee<sup>4</sup>, Dohhoon Kim<sup>3</sup>
+John Heong Lee<sup>1,*</sup>, Dongho Park<sup>1,2</sup>, Ahyun Kim<sup>3</sup>, Charles Cheolgi Lee<sup>4</sup>, Dohhoon Kim<sup>3</sup>, Gwangsoo Kim<sup>5</sup>
 
 1. Graduate School of Biomedical Science and Engineering, Inha University, Incheon, Republic of Korea
 2. Department of Sports Science, Inha University, Incheon, Republic of Korea
 3. Department of Industrial and Management Engineering, Inha University, Incheon, Republic of Korea
 4. Postal Innovation AI Research Team, Korea Postal Service Agency, Republic of Korea
+5. Inha University, Incheon, Republic of Korea
 
 \* Corresponding author: johnlee@inha.edu
 
